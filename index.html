@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Simulador de Taxas Construção Civil</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#eef2f7;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:40px 20px;
+}
+
+.container{
+    width:100%;
+    max-width:850px;
+}
+
+.topo{
+    background:#ffffff;
+    border-radius:18px;
+    padding:30px;
+    text-align:center;
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
+    margin-bottom:30px;
+}
+
+.topo h1{
+    color:#1565C0;
+    letter-spacing:.5px;
+    line-height: 1.3;
+}
+
+.topo h1 .titulo-principal {
+    font-size:34px;
+    font-weight:700;
+    display: block;
+}
+
+.topo h1 .subtitulo-principal {
+    font-size:20px;
+    font-weight:500;
+    display: block;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.subtitulo{
+    font-size:28px;
+    color:#333;
+    margin-bottom:30px;
+    font-weight:600;
+    position:relative;
+}
+
+.subtitulo:after{
+    content:"";
+    width:80px;
+    height:4px;
+    background:#1565C0;
+    position:absolute;
+    left:0;
+    bottom:-10px;
+    border-radius:20px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:22px;
+}
+
+label{
+    font-weight:600;
+    color:#444;
+    margin-bottom:8px;
+}
+
+select,
+input{
+    height:48px;
+    border:1px solid #d7dce3;
+    border-radius:10px;
+    padding:0 15px;
+    font-size:15px;
+    transition:.3s;
+    outline:none;
+}
+
+select:focus,
+input:focus{
+    border-color:#1565C0;
+    box-shadow:0 0 0 4px rgba(21,101,192,.15);
+}
+
+select:disabled {
+    background-color: #f1f3f5;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+input::placeholder{
+    color:#999;
+}
+
+.botao{
+    margin-top:20px;
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:10px;
+    background:#1565C0;
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    white-space: nowrap;
+}
+
+.botao:hover{
+    background:#0d47a1;
+    transform:translateY(-2px);
+}
+
+.botao-voltar {
+    background: #6c757d;
+    margin-top: 30px;
+}
+
+.botao-voltar:hover {
+    background: #5a6268;
+}
+
+.lista-resultados {
+    list-style: none;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #444;
+}
+
+.lista-resultados li {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.lista-resultados li strong {
+    color: #1565C0;
+}
+
+.obs-resultado {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #e3f2fd;
+    border-left: 5px solid #1565C0;
+    border-radius: 4px;
+    font-size: 15px;
+    color: #0d47a1;
+    line-height: 1.5;
+}
+
+footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+footer .nome {
+    font-weight: 600;
+    color: #333;
+}
+
+@media(max-width:700px){
+
+.topo h1 .titulo-principal {
+    font-size:26px;
+}
+
+.topo h1 .subtitulo-principal {
+    font-size:16px;
+}
+
+.subtitulo{
+    font-size:22px;
+}
+
+.card{
+    padding:25px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topo">
+        <h1>
+            <span class="titulo-principal">SIMULADOR</span>
+            <span class="subtitulo-principal">TAXAS DA CONSTRUÇÃO CIVIL</span>
+        </h1>
+    </div>
+
+    <!-- TELA DO FORMULÁRIO DE ENTRADA -->
+    <div class="card" id="tela-formulario">
+
+        <div class="subtitulo">
+            Adicionar dados:
+        </div>
+
+        <div class="form-group">
+
+            <label>CIDADE</label>
+
+            <select>
+                <option>Maringá</option>
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>TIPO DE PROJETO</label>
+
+            <select id="tipo-projeto">
+                <option selected disabled value="">Selecione...</option>
+                <option value="construcao-civil">Construção civil</option>
+                <option value="parcelamento-solo">Parcelamento do solo</option>
+                <option value="certidao-conclusao">Certidão de conclusão</option>
+                <option value="comunicado-demolicao">Comunicado de demolição</option>
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>ITEM DA CONSTRUÇÃO</label>
+
+            <select id="item-construcao" disabled>
+                <option selected disabled value="">Selecione o Tipo de projeto primeiro...</option>
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>UTILIZAÇÃO</label>
+
+            <select id="utilizacao">
+                <option selected disabled value="">Selecione...</option>
+                <option value="Residencial">Residencial</option>
+                <option value="Comercial">Comercial</option>
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>TIPO DE CONSTRUÇÃO</label>
+
+            <select id="tipo-construao">
+                <option selected disabled value="">Selecione...</option>
+                <option value="em alvenaria">Alvenaria</option>
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>ÁREA (m²)</label>
+
+            <input
+                id="area-projeto"
+                type="number"
+                placeholder="Digite a área em metros quadrados"
+                min="0"
+                step="0.01">
+
+        </div>
+
+        <button class="botao" id="btn-confirmar">
+            Confirmar simulação
+        </button>
+
+    </div>
+
+    <!-- TELA DE RESULTADOS -->
+    <div class="card" id="tela-resultado" style="display: none;">
+        
+        <div class="subtitulo">
+            Resultado:
+        </div>
+
+        <div id="texto-descricao-resultado" style="font-size: 18px; font-weight: 500; color: #333; margin-bottom: 25px; line-height: 1.5; border-left: 4px solid #1565C0; padding-left: 12px;">
+            <!-- Preenchido via JS -->
+        </div>
+
+        <ul class="lista-resultados" id="valores-calculados">
+            <!-- Preenchido via JS -->
+        </ul>
+
+        <div class="obs-resultado" id="bloco-observacao">
+            <strong>Observação:</strong> O ISSQN poderá ser dividido em até 12 x sem juros, sendo que o valor mínimo da parcela deverá ser de R$ 50,00.
+        </div>
+
+        <button class="botao botao-voltar" id="btn-voltar">
+            Nova Simulação
+        </button>
+
+    </div>
+
+    <footer>
+        <p>Desenvolvedor</p>
+        <p class="nome">Welerson R. Almeida</p>
+        <p>Técnico em Edificações/Agrimensura</p>
+        <p>Telefone/WhatsApp: (44) 98438-4272</p>
+    </footer>
+
+</div>
+
+<script>
+const opcoesItens = {
+    "construcao-civil": [
+        "Alvará de projeto e execução",
+        "Reforma a executar",
+        "Reforma executada (Não notificada)",
+        "Reforma executada (Notificada)",
+        "Regularização e Certidão de conclusão (Não notificada)",
+        "Regularização e Certidão de conclusão (Notificada)"
+    ],
+    "parcelamento-solo": [
+        "Subdivisão de lote",
+        "Incorporação de lote"
+    ],
+    "certidao-conclusao": [
+        "Certidão de conclusão"
+    ],
+    "comunicado-demolicao": [
+        "Comunicado de demolição já executada",
+        "Comunicado de demolição a executar"
+    ]
+};
+
+const selectProjeto = document.getElementById('tipo-projeto');
+const selectItem = document.getElementById('item-construcao');
+const selectUtilizacao = document.getElementById('utilizacao');
+const selectTipoConstrucao = document.getElementById('tipo-construao');
+const inputArea = document.getElementById('area-projeto');
+
+const btnConfirmar = document.getElementById('btn-confirmar');
+const btnVoltar = document.getElementById('btn-voltar');
+const telaFormulario = document.getElementById('tela-formulario');
+const telaResultado = document.getElementById('tela-resultado');
+const blocoObservacao = document.getElementById('bloco-observacao');
+
+function verificarBloqueios() {
+    if (selectProjeto.value === "parcelamento-solo") {
+        selectUtilizacao.value = "";
+        selectTipoConstrucao.value = "";
+        selectUtilizacao.disabled = true;
+        selectTipoConstrucao.disabled = true;
+    } else {
+        selectUtilizacao.disabled = false;
+        selectTipoConstrucao.disabled = false;
+    }
+}
+
+selectProjeto.addEventListener('change', function() {
+    const valorSelecionado = this.value;
+    selectItem.innerHTML = '';
+    
+    if (valorSelecionado && opcoesItens[valorSelecionado]) {
+        selectItem.disabled = false;
+        const opPadrao = document.createElement('option');
+        opPadrao.text = 'Selecione...';
+        opPadrao.disabled = true;
+        opPadrao.selected = true;
+        opPadrao.value = "";
+        selectItem.appendChild(opPadrao);
+        
+        opcoesItens[valorSelecionado].forEach(function(item) {
+            const novaOpcao = document.createElement('option');
+            novaOpcao.text = item;
+            novaOpcao.value = item;
+            selectItem.appendChild(novaOpcao);
+        });
+    } else {
+        selectItem.disabled = true;
+        const opPadrao = document.createElement('option');
+        opPadrao.text = 'Selecione o Tipo de projeto primeiro...';
+        opPadrao.disabled = true;
+        opPadrao.selected = true;
+        opPadrao.value = "";
+        selectItem.appendChild(opPadrao);
+    }
+    verificarBloqueios();
+});
+
+selectItem.addEventListener('change', verificarBloqueios);
+
+// FUNÇÕES DE CÁLCULO LEGAIS (PÁGINA 1 DO PDF 2026)
+
+function obterTaxaLicenca(linha, area) {
+    if (linha === 1 || linha === 5) { 
+        if (area <= 60) return 39.26;
+        if (area <= 100) return 87.90;
+        if (area <= 200) return 171.61;
+        if (area <= 400) return 256.42;
+        if (area <= 600) return 332.90;
+        if (area <= 1000) return 500.36;
+        if (area <= 2000) return 837.44;
+        if (area <= 6000) return 1168.29;
+        return 1672.84;
+    }
+    if (linha === 3) { 
+        if (area <= 60) return 70.29;
+        if (area <= 100) return 103.37;
+        if (area <= 200) return 134.38;
+        if (area <= 400) return 171.61;
+        if (area <= 600) return 202.62;
+        if (area <= 1000) return 233.65;
+        if (area <= 2000) return 268.79;
+        if (area <= 6000) return 304.78;
+        return 332.90;
+    }
+    if (linha === 6) {
+        if (area <= 600) return 171.61;
+        if (area <= 1000) return 332.90;
+        if (area <= 2000) return 500.36;
+        if (area <= 4000) return 669.95;
+        if (area <= 6000) return 837.44;
+        if (area <= 10000) return 1004.91; 
+        if (area <= 20000) return 1333.19;
+        if (area <= 60000) return 2003.69;
+        return 3333.29;
+    }
+    return 0;
+}
+
+function obterValorMetroISSQN(item, utilizacao, area) {
+    if (item === "Alvará de projeto e execução" || item === "Certidão de conclusão") {
+        if (utilizacao === "Residencial") {
+            if (area <= 200) return 31.58;       
+            if (area <= 300) return 36.68;       
+            return 46.01;                        
+        } else if (utilizacao === "Comercial") {
+            if (area <= 300) return 30.14;       
+            return 33.91;                        
+        }
+    }
+    
+    if (item === "Reforma a executar") {
+        if (utilizacao === "Residencial") return 19.74;
+        if (utilizacao === "Comercial") return 18.84;
+    }
+
+    if (item === "Reforma executada (Não notificada)" || item === "Regularização e Certidão de conclusão (Não notificada)") {
+        if (utilizacao === "Residencial") {
+            if (area <= 200) return 39.47;
+            if (area <= 300) return 45.86;
+            return 57.51;
+        } else if (utilizacao === "Comercial") {
+            if (area <= 300) return 37.68;
+            return 42.38;
+        }
+    }
+
+    if (item === "Reforma executada (Notificada)" || item === "Regularização e Certidão de conclusão (Notificada)") {
+        if (utilizacao === "Residencial") {
+            if (area <= 200) return 63.15;
+            if (area <= 300) return 73.37;
+            return 92.01;
+        } else if (utilizacao === "Comercial") {
+            if (area <= 300) return 60.29;
+            return 67.82;
+        }
+    }
+
+    if (item === "Comunicado de demolição já executada" || item === "Comunicado de demolição a executar") {
+        return 11.84;
+    }
+    
+    return 0;
+}
+
+// MONITORAMENTO DO CLIQUE PARA SIMULAÇÃO
+btnConfirmar.addEventListener('click', function() {
+    const itemSelecionado = selectItem.value;
+    const utilizacao = selectUtilizacao.value;
+    const tipoConstrucaoTexto = selectTipoConstrucao.options[selectTipoConstrucao.selectedIndex].text.toLowerCase();
+    const areaTexto = inputArea.value;
+    const area = parseFloat(areaTexto);
+
+    if (!itemSelecionado || !areaTexto || area <= 0) {
+        alert("Por favor, selecione as opções e informe uma Área válida.");
+        return;
+    }
+
+    const itemsValidos = [
+        "Alvará de projeto e execução", 
+        "Reforma a executar", 
+        "Reforma executada (Não notificada)", 
+        "Reforma executada (Notificada)",
+        "Regularização e Certidão de conclusão (Não notificada)",
+        "Regularização e Certidão de conclusão (Notificada)",
+        "Certidão de conclusão",
+        "Comunicado de demolição já executada",
+        "Comunicado de demolição a executar",
+        "Subdivisão de lote",
+        "Incorporação de lote"
+    ];
+
+    let htmlResultado = "";
+    
+    if (itemsValidos.includes(itemSelecionado)) {
+        
+        // Se for parcelamento de solo (Subdivisão / Incorporação)
+        if (itemSelecionado === "Subdivisão de lote" || itemSelecionado === "Incorporação de lote") {
+            let stringDescricao = `${itemSelecionado} para um terreno/área de ${area.toFixed(2).replace('.', ',')}m².`;
+            document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
+            
+            let taxaLinha06 = obterTaxaLicenca(6, area);
+            htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
+            
+            blocoObservacao.style.display = 'none';
+        } 
+        // Se forem os itens de construção civil que exigem Utilização e Tipo de construção
+        else {
+            if (!utilizacao || !selectTipoConstrucao.value) {
+                alert("Por favor, preencha a Utilização e o Tipo de Construção para prosseguir.");
+                return;
+            }
+            
+            let valorM2ISS = obterValorMetroISSQN(itemSelecionado, utilizacao, area);
+            let totalISSQN = area * valorM2ISS;
+            
+            let artigoUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
+            let stringDescricao = `${itemSelecionado} de uma edificação ${artigoUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
+            
+            document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
+            
+            // Condicionais de Taxas Municipais
+            if (itemSelecionado.startsWith("Regularização")) {
+                let taxaAnalise = obterTaxaLicenca(1, area);
+                let taxaHabitese = obterTaxaLicenca(3, area);
+                htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
+                htmlResultado += `<li>Taxa do habite-se = <strong>R$ ${taxaHabitese.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado === "Reforma executada (Não notificada)" || itemSelecionado === "Reforma executada (Notificada)") {
+                let taxaAnalise = obterTaxaLicenca(1, area);
+                htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado === "Certidão de conclusão") {
+                let taxaHabitese = obterTaxaLicenca(3, area);
+                htmlResultado += `<li>Taxa do habite-se = <strong>R$ ${taxaHabitese.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado.startsWith("Comunicado de demolição")) {
+                let taxaAlvaraDemolicao = obterTaxaLicenca(5, area);
+                htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvaraDemolicao.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else {
+                let taxaAnalise = obterTaxaLicenca(1, area);
+                let taxaAlvara = obterTaxaLicenca(5, area);
+                htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
+                htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvara.toFixed(2).replace('.', ',')}</strong></li>`;
+            }
+            
+            htmlResultado += `<li>ISSQN = <strong>R$ ${totalISSQN.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
+            
+            blocoObservacao.style.display = 'block';
+        }
+    } 
+    else {
+        document.getElementById('texto-descricao-resultado').innerText = "";
+        htmlResultado = `<li>Opção em fase de implementação.</li>`;
+        blocoObservacao.style.display = 'none';
+    }
+
+    document.getElementById('valores-calculados').innerHTML = htmlResultado;
+
+    telaFormulario.style.display = 'none';
+    telaResultado.style.display = 'block';
+    window.scrollTo(0, 0);
+});
+
+btnVoltar.addEventListener('click', function() {
+    telaResultado.style.display = 'none';
+    telaFormulario.style.display = 'block';
+});
+</script>
+
+</body>
+</html>
