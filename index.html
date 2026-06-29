@@ -227,7 +227,6 @@ footer .nome {
         </h1>
     </div>
 
-    <!-- TELA DO FORMULÁRIO DE ENTRADA -->
     <div class="card" id="tela-formulario">
 
         <div class="subtitulo">
@@ -238,8 +237,9 @@ footer .nome {
 
             <label>CIDADE</label>
 
-            <select>
-                <option>Maringá</option>
+            <select id="cidade">
+                <option selected disabled value="">Selecione...</option>
+                <option value="Maringá">Maringá</option>
             </select>
 
         </div>
@@ -248,8 +248,8 @@ footer .nome {
 
             <label>TIPO DE PROJETO</label>
 
-            <select id="tipo-projeto">
-                <option selected disabled value="">Selecione...</option>
+            <select id="tipo-projeto" disabled>
+                <option selected disabled value="">Selecione a Cidade primeiro...</option>
                 <option value="construcao-civil">Construção civil</option>
                 <option value="parcelamento-solo">Parcelamento do solo</option>
                 <option value="certidao-conclusao">Certidão de conclusão</option>
@@ -272,8 +272,8 @@ footer .nome {
 
             <label>UTILIZAÇÃO</label>
 
-            <select id="utilizacao">
-                <option selected disabled value="">Selecione...</option>
+            <select id="utilizacao" disabled>
+                <option selected disabled value="">Selecione o Item primeiro...</option>
                 <option value="Residencial">Residencial</option>
                 <option value="Comercial">Comercial</option>
             </select>
@@ -284,8 +284,8 @@ footer .nome {
 
             <label>TIPO DE CONSTRUÇÃO</label>
 
-            <select id="tipo-construao">
-                <option selected disabled value="">Selecione...</option>
+            <select id="tipo-construao" disabled>
+                <option selected disabled value="">Selecione a Utilização primeiro...</option>
                 <option value="em alvenaria">Alvenaria</option>
             </select>
 
@@ -298,19 +298,19 @@ footer .nome {
             <input
                 id="area-projeto"
                 type="number"
-                placeholder="Digite a área em metros quadrados"
+                placeholder="Aguardando passos anteriores..."
                 min="0"
-                step="0.01">
+                step="0.01"
+                disabled>
 
         </div>
 
-        <button class="botao" id="btn-confirmar">
+        <button class="botao" id="btn-confirmar" disabled>
             Confirmar simulação
         </button>
 
     </div>
 
-    <!-- TELA DE RESULTADOS -->
     <div class="card" id="tela-resultado" style="display: none;">
         
         <div class="subtitulo">
@@ -318,12 +318,10 @@ footer .nome {
         </div>
 
         <div id="texto-descricao-resultado" style="font-size: 18px; font-weight: 500; color: #333; margin-bottom: 25px; line-height: 1.5; border-left: 4px solid #1565C0; padding-left: 12px;">
-            <!-- Preenchido via JS -->
-        </div>
+            </div>
 
         <ul class="lista-resultados" id="valores-calculados">
-            <!-- Preenchido via JS -->
-        </ul>
+            </ul>
 
         <div class="obs-resultado" id="bloco-observacao">
             <strong>Observação:</strong> O ISSQN poderá ser dividido em até 12 x sem juros, sendo que o valor mínimo da parcela deverá ser de R$ 50,00.
@@ -367,6 +365,7 @@ const opcoesItens = {
     ]
 };
 
+const selectCidade = document.getElementById('cidade');
 const selectProjeto = document.getElementById('tipo-projeto');
 const selectItem = document.getElementById('item-construcao');
 const selectUtilizacao = document.getElementById('utilizacao');
@@ -379,22 +378,21 @@ const telaFormulario = document.getElementById('tela-formulario');
 const telaResultado = document.getElementById('tela-resultado');
 const blocoObservacao = document.getElementById('bloco-observacao');
 
-function verificarBloqueios() {
-    if (selectProjeto.value === "parcelamento-solo") {
-        selectUtilizacao.value = "";
-        selectTipoConstrucao.value = "";
-        selectUtilizacao.disabled = true;
-        selectTipoConstrucao.disabled = true;
-    } else {
-        selectUtilizacao.disabled = false;
-        selectTipoConstrucao.disabled = false;
+// LÓGICA DE SEQUENCIAMENTO CAMPO A CAMPO (CASCATA ATUALIZADA)
+
+selectCidade.addEventListener('change', function() {
+    if (this.value === "Maringá") {
+        selectProjeto.disabled = false;
+        selectProjeto.options[0].text = "Selecione...";
+        resetarPassosAbaixoDe('projeto');
     }
-}
+});
 
 selectProjeto.addEventListener('change', function() {
     const valorSelecionado = this.value;
     selectItem.innerHTML = '';
-    
+    resetarPassosAbaixoDe('item');
+
     if (valorSelecionado && opcoesItens[valorSelecionado]) {
         selectItem.disabled = false;
         const opPadrao = document.createElement('option');
@@ -410,19 +408,85 @@ selectProjeto.addEventListener('change', function() {
             novaOpcao.value = item;
             selectItem.appendChild(novaOpcao);
         });
-    } else {
-        selectItem.disabled = true;
-        const opPadrao = document.createElement('option');
-        opPadrao.text = 'Selecione o Tipo de projeto primeiro...';
-        opPadrao.disabled = true;
-        opPadrao.selected = true;
-        opPadrao.value = "";
-        selectItem.appendChild(opPadrao);
     }
-    verificarBloqueios();
+    verificarBloqueiosEspeciais();
 });
 
-selectItem.addEventListener('change', verificarBloqueios);
+selectItem.addEventListener('change', function() {
+    if (this.value !== "") {
+        resetarPassosAbaixoDe('utilizacao');
+        verificarBloqueiosEspeciais();
+    }
+});
+
+selectUtilizacao.addEventListener('change', function() {
+    if (this.value !== "") {
+        selectTipoConstrucao.disabled = false;
+        selectTipoConstrucao.options[0].text = "Selecione...";
+        selectTipoConstrucao.value = "";
+        resetarPassosAbaixoDe('tipo-construcao');
+    }
+});
+
+selectTipoConstrucao.addEventListener('change', function() {
+    if (this.value !== "") {
+        inputArea.disabled = false;
+        inputArea.placeholder = "Digite a área em metros quadrados";
+        inputArea.value = "";
+        btnConfirmar.disabled = true;
+    }
+});
+
+inputArea.addEventListener('input', function() {
+    if (this.value !== "" && parseFloat(this.value) > 0) {
+        btnConfirmar.disabled = false;
+    } else {
+        btnConfirmar.disabled = true;
+    }
+});
+
+function verificarBloqueiosEspeciais() {
+    if (selectProjeto.value === "parcelamento-solo") {
+        selectUtilizacao.value = "";
+        selectTipoConstrucao.value = "";
+        selectUtilizacao.disabled = true;
+        selectTipoConstrucao.disabled = true;
+        selectUtilizacao.options[0].text = "Não aplicável";
+        selectTipoConstrucao.options[0].text = "Não aplicável";
+        
+        inputArea.disabled = false;
+        inputArea.placeholder = "Digite a área em metros quadrados";
+    } else {
+        if (selectItem.value !== "") {
+            selectUtilizacao.disabled = false;
+            if (selectUtilizacao.options[0].text.includes("primeiro")) {
+                selectUtilizacao.options[0].text = "Selecione...";
+            }
+        }
+    }
+}
+
+function resetarPassosAbaixoDe(nivel) {
+    if (nivel === 'projeto') {
+        selectProjeto.value = "";
+        selectItem.innerHTML = '<option selected disabled value="">Selecione o Tipo de projeto primeiro...</option>';
+        selectItem.disabled = true;
+    }
+    if (nivel === 'projeto' || nivel === 'item') {
+        selectUtilizacao.value = "";
+        selectUtilizacao.disabled = true;
+        selectUtilizacao.options[0].text = "Selecione o Item primeiro...";
+    }
+    if (nivel === 'projeto' || nivel === 'item' || nivel === 'utilizacao') {
+        selectTipoConstrucao.value = "";
+        selectTipoConstrucao.disabled = true;
+        selectTipoConstrucao.options[0].text = "Selecione a Utilização primeiro...";
+    }
+    inputArea.value = "";
+    inputArea.disabled = true;
+    inputArea.placeholder = "Aguardando passos anteriores...";
+    btnConfirmar.disabled = true;
+}
 
 // FUNÇÕES DE CÁLCULO LEGAIS (PÁGINA 1 DO PDF 2026)
 
@@ -513,7 +577,7 @@ function obterValorMetroISSQN(item, utilizacao, area) {
 btnConfirmar.addEventListener('click', function() {
     const itemSelecionado = selectItem.value;
     const utilizacao = selectUtilizacao.value;
-    const tipoConstrucaoTexto = selectTipoConstrucao.options[selectTipoConstrucao.selectedIndex].text.toLowerCase();
+    const tipoConstrucaoTexto = selectTipoConstrucao.selectedIndex >= 0 ? selectTipoConstrucao.options[selectTipoConstrucao.selectedIndex].text.toLowerCase() : "";
     const areaTexto = inputArea.value;
     const area = parseFloat(areaTexto);
 
@@ -577,7 +641,10 @@ btnConfirmar.addEventListener('click', function() {
             } else if (itemSelecionado === "Certidão de conclusão") {
                 let taxaHabitese = obterTaxaLicenca(3, area);
                 htmlResultado += `<li>Taxa do habite-se = <strong>R$ ${taxaHabitese.toFixed(2).replace('.', ',')}</strong></li>`;
-            } else if (itemSelecionado.startsWith("Comunicado de demolição")) {
+            } else if (itemSelecionado === "Comunicado de demolição já executada") {
+                let taxaAlvaraDemolicao = obterTaxaLicenca(5, area);
+                htmlResultado += `<li>Taxa de alvará/Certidão de demolição = <strong>R$ ${taxaAlvaraDemolicao.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado === "Comunicado de demolição a executar") {
                 let taxaAlvaraDemolicao = obterTaxaLicenca(5, area);
                 htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvaraDemolicao.toFixed(2).replace('.', ',')}</strong></li>`;
             } else {
@@ -606,8 +673,15 @@ btnConfirmar.addEventListener('click', function() {
 });
 
 btnVoltar.addEventListener('click', function() {
+    // Reset estruturado completo ao retornar
+    selectCidade.value = "";
+    resetarPassosAbaixoDe('projeto');
+    selectProjeto.disabled = true;
+    selectProjeto.options[0].text = "Selecione a Cidade primeiro...";
+    
     telaResultado.style.display = 'none';
     telaFormulario.style.display = 'block';
+    window.scrollTo(0, 0);
 });
 </script>
 
