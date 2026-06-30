@@ -168,6 +168,17 @@ input::placeholder{
     color: #1565C0;
 }
 
+.obs-issqn {
+    font-size: 14px;
+    color: #666;
+    background: #f8f9fa;
+    border-left: 4px solid #6c757d;
+    padding: 12px 15px;
+    margin-top: 20px;
+    border-radius: 0 8px 8px 0;
+    line-height: 1.5;
+}
+
 footer {
     margin-top: 40px;
     text-align: center;
@@ -312,6 +323,10 @@ footer .nome {
         <ul class="lista-resultados" id="valores-calculados">
             </ul>
 
+        <div class="obs-issqn" id="bloco-obs-issqn" style="display: none;">
+            <strong>Observação:</strong> O ISSQN poderá ser parcelado em até 12 (doze) parcelas, sem incidência de juros, desde que o valor mínimo de cada parcela seja de R$ 50,00.
+        </div>
+
         <button class="botao botao-voltar" id="btn-voltar">
             Nova Simulação
         </button>
@@ -361,6 +376,7 @@ const btnConfirmar = document.getElementById('btn-confirmar');
 const btnVoltar = document.getElementById('btn-voltar');
 const telaFormulario = document.getElementById('tela-formulario');
 const telaResultado = document.getElementById('tela-resultado');
+const blocoObsIssqn = document.getElementById('bloco-obs-issqn');
 
 // LÓGICA DE SEQUENCIAMENTO CAMPO A CAMPO (CASCATA ATUALIZADA)
 
@@ -585,6 +601,7 @@ btnConfirmar.addEventListener('click', function() {
     ];
 
     let htmlResultado = "";
+    let exibeObsISSQN = false;
     
     if (itemsValidos.includes(itemSelecionado)) {
         
@@ -595,6 +612,7 @@ btnConfirmar.addEventListener('click', function() {
             
             let taxaLinha06 = obterTaxaLicenca(6, area);
             htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
+            exibeObsISSQN = false;
         } 
         // Se forem os itens de construção civil que exigem Utilização e Tipo de construção
         else {
@@ -642,14 +660,22 @@ btnConfirmar.addEventListener('click', function() {
             }
             
             htmlResultado += `<li>ISSQN = <strong>R$ ${totalISSQN.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
+            exibeObsISSQN = true;
         }
     } 
     else {
         document.getElementById('texto-descricao-resultado').innerText = "";
         htmlResultado = `<li>Opção em fase de implementação.</li>`;
+        exibeObsISSQN = false;
     }
 
     document.getElementById('valores-calculados').innerHTML = htmlResultado;
+    
+    if (exibeObsISSQN) {
+        blocoObsIssqn.style.display = 'block';
+    } else {
+        blocoObsIssqn.style.display = 'none';
+    }
 
     telaFormulario.style.display = 'none';
     telaResultado.style.display = 'block';
