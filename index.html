@@ -635,6 +635,11 @@ btnConfirmar.addEventListener('click', function() {
                 let taxaAlvaraFixa = 99.57;
                 htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
                 htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvaraFixa.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado === "Reforma a executar") {
+                let taxaAnalise = obterTaxaLicenca(1, area);
+                let taxaAlvaraFixa = 99.57; // Fixado em R$ 99,57 conforme solicitação
+                htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
+                htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvaraFixa.toFixed(2).replace('.', ',')}</strong></li>`;
             } else if (itemSelecionado.startsWith("Regularização")) {
                 let taxaAnalise = obterTaxaLicenca(1, area);
                 let taxaHabitese = obterTaxaLicenca(3, area);
