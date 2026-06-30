@@ -142,15 +142,6 @@ input::placeholder{
     transform:translateY(-2px);
 }
 
-.botao-voltar {
-    background: #6c757d;
-    margin-top: 30px;
-}
-
-.botao-voltar:hover {
-    background: #5a6268;
-}
-
 .lista-resultados {
     list-style: none;
     margin-top: 20px;
@@ -166,17 +157,6 @@ input::placeholder{
 
 .lista-resultados li strong {
     color: #1565C0;
-}
-
-.obs-resultado {
-    margin-top: 25px;
-    padding: 15px;
-    background-color: #e3f2fd;
-    border-left: 5px solid #1565C0;
-    border-radius: 4px;
-    font-size: 15px;
-    color: #0d47a1;
-    line-height: 1.5;
 }
 
 footer {
@@ -321,15 +301,7 @@ footer .nome {
             </div>
 
         <ul class="lista-resultados" id="valores-calculados">
-            </div>
-
-        <div class="obs-resultado" id="bloco-observacao">
-            <strong>Observação:</strong> O ISSQN poderá ser dividido em até 12 x sem juros, sendo que o valor mínimo da parcela deverá ser de R$ 50,00.
-        </div>
-
-        <button class="botao botao-voltar" id="btn-voltar">
-            Nova Simulação
-        </button>
+            </ul>
 
     </div>
 
@@ -373,10 +345,8 @@ const selectTipoConstrucao = document.getElementById('tipo-construao');
 const inputArea = document.getElementById('area-projeto');
 
 const btnConfirmar = document.getElementById('btn-confirmar');
-const btnVoltar = document.getElementById('btn-voltar');
 const telaFormulario = document.getElementById('tela-formulario');
 const telaResultado = document.getElementById('tela-resultado');
-const blocoObservacao = document.getElementById('bloco-observacao');
 
 // LÓGICA DE SEQUENCIAMENTO CAMPO A CAMPO (CASCATA ATUALIZADA)
 
@@ -611,8 +581,6 @@ btnConfirmar.addEventListener('click', function() {
             
             let taxaLinha06 = obterTaxaLicenca(6, area);
             htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
-            
-            blocoObservacao.style.display = 'none';
         } 
         // Se forem os itens de construção civil que exigem Utilização e Tipo de construção
         else {
@@ -660,32 +628,17 @@ btnConfirmar.addEventListener('click', function() {
             }
             
             htmlResultado += `<li>ISSQN = <strong>R$ ${totalISSQN.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
-            
-            blocoObservacao.style.display = 'block';
         }
     } 
     else {
         document.getElementById('texto-descricao-resultado').innerText = "";
         htmlResultado = `<li>Opção em fase de implementação.</li>`;
-        blocoObservacao.style.display = 'none';
     }
 
     document.getElementById('valores-calculados').innerHTML = htmlResultado;
 
     telaFormulario.style.display = 'none';
     telaResultado.style.display = 'block';
-    window.scrollTo(0, 0);
-});
-
-btnVoltar.addEventListener('click', function() {
-    // Reset estruturado completo ao retornar
-    selectCidade.value = "";
-    resetarPassosAbaixoDe('projeto');
-    selectProjeto.disabled = true;
-    selectProjeto.options[0].text = "Selecione a Cidade primeiro...";
-    
-    telaResultado.style.display = 'none';
-    telaFormulario.style.display = 'block';
     window.scrollTo(0, 0);
 });
 </script>
