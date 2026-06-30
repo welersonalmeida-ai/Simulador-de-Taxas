@@ -142,6 +142,15 @@ input::placeholder{
     transform:translateY(-2px);
 }
 
+.botao-voltar {
+    background: #6c757d;
+    margin-top: 30px;
+}
+
+.botao-voltar:hover {
+    background: #5a6268;
+}
+
 .lista-resultados {
     list-style: none;
     margin-top: 20px;
@@ -303,6 +312,10 @@ footer .nome {
         <ul class="lista-resultados" id="valores-calculados">
             </ul>
 
+        <button class="botao botao-voltar" id="btn-voltar">
+            Nova Simulação
+        </button>
+
     </div>
 
     <footer>
@@ -345,6 +358,7 @@ const selectTipoConstrucao = document.getElementById('tipo-construao');
 const inputArea = document.getElementById('area-projeto');
 
 const btnConfirmar = document.getElementById('btn-confirmar');
+const btnVoltar = document.getElementById('btn-voltar');
 const telaFormulario = document.getElementById('tela-formulario');
 const telaResultado = document.getElementById('tela-resultado');
 
@@ -639,6 +653,18 @@ btnConfirmar.addEventListener('click', function() {
 
     telaFormulario.style.display = 'none';
     telaResultado.style.display = 'block';
+    window.scrollTo(0, 0);
+});
+
+btnVoltar.addEventListener('click', function() {
+    // Reset estruturado completo ao retornar
+    selectCidade.value = "";
+    resetarPassosAbaixoDe('projeto');
+    selectProjeto.disabled = true;
+    selectProjeto.options[0].text = "Selecione a Cidade primeiro...";
+    
+    telaResultado.style.display = 'none';
+    telaFormulario.style.display = 'block';
     window.scrollTo(0, 0);
 });
 </script>
