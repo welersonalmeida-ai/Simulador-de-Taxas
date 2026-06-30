@@ -321,7 +321,7 @@ footer .nome {
             </div>
 
         <ul class="lista-resultados" id="valores-calculados">
-            </ul>
+            </div>
 
         <div class="obs-resultado" id="bloco-observacao">
             <strong>Observação:</strong> O ISSQN poderá ser dividido em até 12 x sem juros, sendo que o valor mínimo da parcela deverá ser de R$ 50,00.
@@ -491,7 +491,7 @@ function resetarPassosAbaixoDe(nivel) {
 // FUNÇÕES DE CÁLCULO LEGAIS (PÁGINA 1 DO PDF 2026)
 
 function obterTaxaLicenca(linha, area) {
-    if (linha === 1 || linha === 5) { 
+    if (linha === 1 || Math.abs(linha - 5) < 0.01) { 
         if (area <= 60) return 39.26;
         if (area <= 100) return 87.90;
         if (area <= 200) return 171.61;
@@ -624,13 +624,18 @@ btnConfirmar.addEventListener('click', function() {
             let valorM2ISS = obterValorMetroISSQN(itemSelecionado, utilizacao, area);
             let totalISSQN = area * valorM2ISS;
             
-            let artigoUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
-            let stringDescricao = `${itemSelecionado} de uma edificação ${artigoUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
+            let articleUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
+            let stringDescricao = `${itemSelecionado} de uma edificação ${articleUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
             
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
             // Condicionais de Taxas Municipais
-            if (itemSelecionado.startsWith("Regularização")) {
+            if (itemSelecionado === "Alvará de projeto e execução") {
+                let taxaAnalise = obterTaxaLicenca(1, area);
+                let taxaAlvaraFixa = 99.57;
+                htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
+                htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvaraFixa.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado.startsWith("Regularização")) {
                 let taxaAnalise = obterTaxaLicenca(1, area);
                 let taxaHabitese = obterTaxaLicenca(3, area);
                 htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
