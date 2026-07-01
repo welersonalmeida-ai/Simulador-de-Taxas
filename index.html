@@ -610,7 +610,8 @@ btnConfirmar.addEventListener('click', function() {
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
             let taxaLinha06 = obterTaxaLicenca(6, area);
-            htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
+            // Alterado exclusivamente o texto de exibição para "Taxa de análise" conforme solicitado
+            htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
             exibeObsISSQN = false;
         } 
         // Se forem os itens de construção civil que exigem Utilização e Tipo de construção
