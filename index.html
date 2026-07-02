@@ -349,18 +349,26 @@ const opcoesItens = {
         "Reforma executada (Não notificada)",
         "Reforma executada (Notificada)",
         "Regularização e Certidão de conclusão (Não notificada)",
-        "Regularização e Certidão de conclusão (Notificada)"
+        "Regularização e Certidão de conclusão (Notificada)",
+        "Alvará de projeto",
+        "Alvará de execução",
+        "Renovação de alvará de projeto",
+        "Renovação de alvará de execução",
+        "Renovação de alvará de reforma"
     ],
     "parcelamento-solo": [
         "Subdivisão de lote",
-        "Incorporação de lote"
+        "Incorporação de lote",
+        "Renovação de alvará de subdivisão de lote",
+        "Renovação de alvará de incorporação de lote"
     ],
     "certidao-conclusao": [
         "Certidão de conclusão"
     ],
     "comunicado-demolicao": [
         "Comunicado de demolição já executada",
-        "Comunicado de demolição a executar"
+        "Comunicado de demolição a executar",
+        "Renovação de alvará de demolição"
     ]
 };
 
@@ -445,7 +453,11 @@ inputArea.addEventListener('input', function() {
 });
 
 function verificarBloqueiosEspeciais() {
-    if (selectProjeto.value === "parcelamento-solo") {
+    const item = selectItem.value;
+    
+    // Regra de bloqueio de Utilização/Tipo para itens de parcelamento do solo e comunicados de demolição antigos
+    // Mantendo a liberação para os itens da construção civil conforme regras passadas
+    if (selectProjeto.value === "parcelamento-solo" || selectProjeto.value === "comunicado-demolicao") {
         selectUtilizacao.value = "";
         selectTipoConstrucao.value = "";
         selectUtilizacao.disabled = true;
@@ -458,8 +470,11 @@ function verificarBloqueiosEspeciais() {
     } else {
         if (selectItem.value !== "") {
             selectUtilizacao.disabled = false;
-            if (selectUtilizacao.options[0].text.includes("primeiro")) {
+            if (selectUtilizacao.options[0].text.includes("primeiro") || selectUtilizacao.options[0].text.includes("aplicável")) {
                 selectUtilizacao.options[0].text = "Selecione...";
+            }
+            if (selectTipoConstrucao.options[0].text.includes("aplicável")) {
+                selectTipoConstrucao.options[0].text = "Selecione a Utilização primeiro...";
             }
         }
     }
@@ -596,7 +611,15 @@ btnConfirmar.addEventListener('click', function() {
         "Comunicado de demolição já executada",
         "Comunicado de demolição a executar",
         "Subdivisão de lote",
-        "Incorporação de lote"
+        "Incorporação de lote",
+        "Alvará de projeto",
+        "Alvará de execução",
+        "Renovação de alvará de projeto",
+        "Renovação de alvará de execução",
+        "Renovação de alvará de reforma",
+        "Renovação de alvará de subdivisão de lote",
+        "Renovação de alvará de incorporação de lote",
+        "Renovação de alvará de demolição"
     ];
 
     let htmlResultado = "";
@@ -604,33 +627,70 @@ btnConfirmar.addEventListener('click', function() {
     
     if (itemsValidos.includes(itemSelecionado)) {
         
-        // Se for parcelamento de solo (Subdivisão / Incorporação)
-        if (itemSelecionado === "Subdivisão de lote" || itemSelecionado === "Incorporação de lote") {
+        // Novas opções de renovação adicionadas para resultado fixo de R$ 99,57
+        if (itemSelecionado === "Renovação de alvará de subdivisão de lote" || 
+            itemSelecionado === "Renovação de alvará de incorporação de lote" ||
+            itemSelecionado === "Renovação de alvará de demolição") {
+            
+            let stringDescricao = `${itemSelecionado} para uma área de ${area.toFixed(2).replace('.', ',')}m².`;
+            document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
+            
+            htmlResultado += `<li>Taxa de renovação do alvará = <strong>R$ 99,57</strong></li>`;
+            exibeObsISSQN = false;
+        }
+        // Regra para Itens Fixos de R$ 99,57 originais da construção civil
+        else if (itemSelecionado === "Alvará de projeto" || 
+            itemSelecionado === "Renovação de alvará de projeto" || 
+            itemSelecionado === "Renovação de alvará de reforma") {
+            
+            let articleUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
+            let stringDescricao = `${itemSelecionado} de uma edificação ${articleUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
+            document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
+            
+            if (itemSelecionado === "Alvará de projeto") {
+                htmlResultado += `<li>Taxa de alvará de projeto = <strong>R$ 99,57</strong></li>`;
+            } else {
+                htmlResultado += `<li>Taxa de renovação do alvará = <strong>R$ 99,57</strong></li>`;
+            }
+            exibeObsISSQN = false;
+        }
+        // Se for parcelamento de solo convencional (Subdivisão / Incorporação)
+        else if (itemSelecionado === "Subdivisão de lote" || itemSelecionado === "Incorporação de lote") {
             let stringDescricao = `${itemSelecionado} para um terreno/área de ${area.toFixed(2).replace('.', ',')}m².`;
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
             let taxaLinha06 = obterTaxaLicenca(6, area);
-            // Alterado exclusivamente o texto de exibição para "Taxa de análise" conforme solicitado
             htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
             exibeObsISSQN = false;
         } 
-        // Se forem os itens de construção civil que exigem Utilização e Tipo de construção
+        // Se forem os itens de construção civil convencionais e comunicados antigos
         else {
             if (!utilizacao || !selectTipoConstrucao.value) {
-                alert("Por favor, preencha a Utilização e o Tipo de Construção para prosseguir.");
-                return;
+                // Para os itens de comunicado de demolição antigos que não possuem utilização liberada
+                if (selectProjeto.value !== "comunicado-demolicao") {
+                    alert("Por favor, preencha a Utilização e o Tipo de Construção para prosseguir.");
+                    return;
+                }
             }
             
             let valorM2ISS = obterValorMetroISSQN(itemSelecionado, utilizacao, area);
             let totalISSQN = area * valorM2ISS;
             
-            let articleUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
-            let stringDescricao = `${itemSelecionado} de uma edificação ${articleUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
+            let stringDescricao = "";
+            if (selectProjeto.value === "comunicado-demolicao") {
+                stringDescricao = `${itemSelecionado} para uma área de ${area.toFixed(2).replace('.', ',')}m².`;
+            } else {
+                let articleUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
+                stringDescricao = `${itemSelecionado} de uma edificação ${articleUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
+            }
             
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
             // Condicionais de Taxas Municipais
-            if (itemSelecionado === "Alvará de projeto e execução") {
+            if (itemSelecionado === "Alvará de execução" || itemSelecionado === "Renovação de alvará de execução") {
+                let taxaItem05 = obterTaxaLicenca(5, area);
+                htmlResultado += `<li>Taxa de alvará de execução = <strong>R$ ${taxaItem05.toFixed(2).replace('.', ',')}</strong></li>`;
+            } else if (itemSelecionado === "Alvará de projeto e execução") {
                 let taxaAnalise = obterTaxaLicenca(1, area);
                 let taxaAlvaraFixa = 99.57;
                 htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnalise.toFixed(2).replace('.', ',')}</strong></li>`;
@@ -664,8 +724,11 @@ btnConfirmar.addEventListener('click', function() {
                 htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvara.toFixed(2).replace('.', ',')}</strong></li>`;
             }
             
-            htmlResultado += `<li>ISSQN = <strong>R$ ${totalISSQN.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
-            exibeObsISSQN = true;
+            // Não exibe ISSQN para Alvará de execução e Renovação de alvará de execução
+            if (itemSelecionado !== "Alvará de execução" && itemSelecionado !== "Renovação de alvará de execução") {
+                htmlResultado += `<li>ISSQN = <strong>R$ ${totalISSQN.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
+                exibeObsISSQN = true;
+            }
         }
     } 
     else {
@@ -688,7 +751,6 @@ btnConfirmar.addEventListener('click', function() {
 });
 
 btnVoltar.addEventListener('click', function() {
-    // Reset estruturado completo ao retornar
     selectCidade.value = "";
     resetarPassosAbaixoDe('projeto');
     selectProjeto.disabled = true;
