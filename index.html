@@ -453,10 +453,6 @@ inputArea.addEventListener('input', function() {
 });
 
 function verificarBloqueiosEspeciais() {
-    const item = selectItem.value;
-    
-    // Regra de bloqueio de Utilização/Tipo para itens de parcelamento do solo e comunicados de demolição antigos
-    // Mantendo a liberação para os itens da construção civil conforme regras passadas
     if (selectProjeto.value === "parcelamento-solo" || selectProjeto.value === "comunicado-demolicao") {
         selectUtilizacao.value = "";
         selectTipoConstrucao.value = "";
@@ -618,6 +614,7 @@ btnConfirmar.addEventListener('click', function() {
         "Renovação de alvará de execução",
         "Renovação de alvará de reforma",
         "Renovação de alvará de subdivisão de lote",
+        "Renovação de alvará de Slate de lote",
         "Renovação de alvará de incorporação de lote",
         "Renovação de alvará de demolição"
     ];
@@ -638,7 +635,7 @@ btnConfirmar.addEventListener('click', function() {
             htmlResultado += `<li>Taxa de renovação do alvará = <strong>R$ 99,57</strong></li>`;
             exibeObsISSQN = false;
         }
-        // Regra para Itens Fixos de R$ 99,57 originais da construção civil
+        // Regra para Itens Fixos de R$ 99,57 da construção civil (incluindo a nova regra de Taxa de análise para Alvará de projeto)
         else if (itemSelecionado === "Alvará de projeto" || 
             itemSelecionado === "Renovação de alvará de projeto" || 
             itemSelecionado === "Renovação de alvará de reforma") {
@@ -648,6 +645,8 @@ btnConfirmar.addEventListener('click', function() {
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
             if (itemSelecionado === "Alvará de projeto") {
+                let taxaAnaliseItem01 = obterTaxaLicenca(1, area);
+                htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaAnaliseItem01.toFixed(2).replace('.', ',')}</strong></li>`;
                 htmlResultado += `<li>Taxa de alvará de projeto = <strong>R$ 99,57</strong></li>`;
             } else {
                 htmlResultado += `<li>Taxa de renovação do alvará = <strong>R$ 99,57</strong></li>`;
@@ -666,7 +665,6 @@ btnConfirmar.addEventListener('click', function() {
         // Se forem os itens de construção civil convencionais e comunicados antigos
         else {
             if (!utilizacao || !selectTipoConstrucao.value) {
-                // Para os itens de comunicado de demolição antigos que não possuem utilização liberada
                 if (selectProjeto.value !== "comunicado-demolicao") {
                     alert("Por favor, preencha a Utilização e o Tipo de Construção para prosseguir.");
                     return;
