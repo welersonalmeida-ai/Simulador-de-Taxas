@@ -344,14 +344,14 @@ footer .nome {
 <script>
 const opcoesItens = {
     "construcao-civil": [
+        "Alvará de projeto",
+        "Alvará de execução",
         "Alvará de projeto e execução",
         "Reforma a executar",
         "Reforma executada (Não notificada)",
         "Reforma executada (Notificada)",
         "Regularização e Certidão de conclusão (Não notificada)",
         "Regularização e Certidão de conclusão (Notificada)",
-        "Alvará de projeto",
-        "Alvará de execução",
         "Renovação de alvará de projeto",
         "Renovação de alvará de execução",
         "Renovação de alvará de reforma"
@@ -614,7 +614,6 @@ btnConfirmar.addEventListener('click', function() {
         "Renovação de alvará de execução",
         "Renovação de alvará de reforma",
         "Renovação de alvará de subdivisão de lote",
-        "Renovação de alvará de Slate de lote",
         "Renovação de alvará de incorporação de lote",
         "Renovação de alvará de demolição"
     ];
@@ -624,7 +623,6 @@ btnConfirmar.addEventListener('click', function() {
     
     if (itemsValidos.includes(itemSelecionado)) {
         
-        // Novas opções de renovação adicionadas para resultado fixo de R$ 99,57
         if (itemSelecionado === "Renovação de alvará de subdivisão de lote" || 
             itemSelecionado === "Renovação de alvará de incorporação de lote" ||
             itemSelecionado === "Renovação de alvará de demolição") {
@@ -635,7 +633,6 @@ btnConfirmar.addEventListener('click', function() {
             htmlResultado += `<li>Taxa de renovação do alvará = <strong>R$ 99,57</strong></li>`;
             exibeObsISSQN = false;
         }
-        // Regra para Itens Fixos de R$ 99,57 da construção civil (incluindo a nova regra de Taxa de análise para Alvará de projeto)
         else if (itemSelecionado === "Alvará de projeto" || 
             itemSelecionado === "Renovação de alvará de projeto" || 
             itemSelecionado === "Renovação de alvará de reforma") {
@@ -653,16 +650,14 @@ btnConfirmar.addEventListener('click', function() {
             }
             exibeObsISSQN = false;
         }
-        // Se for parcelamento de solo convencional (Subdivisão / Incorporação)
         else if (itemSelecionado === "Subdivisão de lote" || itemSelecionado === "Incorporação de lote") {
-            let stringDescricao = `${itemSelecionado} para um terreno/área de ${area.toFixed(2).replace('.', ',')}m².`;
+            let stringDescricao = `${itemSelecionado} para um terrain/área de ${area.toFixed(2).replace('.', ',')}m².`;
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
             let taxaLinha06 = obterTaxaLicenca(6, area);
             htmlResultado += `<li>Taxa de análise = <strong>R$ ${taxaLinha06.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
             exibeObsISSQN = false;
         } 
-        // Se forem os itens de construção civil convencionais e comunicados antigos
         else {
             if (!utilizacao || !selectTipoConstrucao.value) {
                 if (selectProjeto.value !== "comunicado-demolicao") {
@@ -684,7 +679,6 @@ btnConfirmar.addEventListener('click', function() {
             
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
-            // Condicionais de Taxas Municipais
             if (itemSelecionado === "Alvará de execução" || itemSelecionado === "Renovação de alvará de execução") {
                 let taxaItem05 = obterTaxaLicenca(5, area);
                 htmlResultado += `<li>Taxa de alvará de execução = <strong>R$ ${taxaItem05.toFixed(2).replace('.', ',')}</strong></li>`;
@@ -722,7 +716,6 @@ btnConfirmar.addEventListener('click', function() {
                 htmlResultado += `<li>Taxa do alvará = <strong>R$ ${taxaAlvara.toFixed(2).replace('.', ',')}</strong></li>`;
             }
             
-            // Não exibe ISSQN para Alvará de execução e Renovação de alvará de execução
             if (itemSelecionado !== "Alvará de execução" && itemSelecionado !== "Renovação de alvará de execução") {
                 htmlResultado += `<li>ISSQN = <strong>R$ ${totalISSQN.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></li>`;
                 exibeObsISSQN = true;
