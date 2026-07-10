@@ -291,6 +291,7 @@ body {
                 <option selected disabled value="">Selecione o Item primeiro...</option>
                 <option value="Residencial">Residencial</option>
                 <option value="Comercial">Comercial</option>
+                <option value="Galpão">Galpão</option>
             </select>
 
         </div>
@@ -553,6 +554,21 @@ function obterTaxaLicenca(linha, area) {
 }
 
 function obterValorMetroISSQN(item, utilizacao, area) {
+    if (utilizacao === "Galpão") {
+        if (item === "Alvará de projeto e execução" || item === "Certidão de conclusão") {
+            return 16.90;
+        }
+        if (item === "Reforma a executar") {
+            return 10.56; 
+        }
+        if (item === "Reforma executada (Não notificada)" || item === "Regularização e Certidão de conclusão (Não notificada)") {
+            return 21.13;
+        }
+        if (item === "Reforma executada (Notificada)" || item === "Regularização e Certidão de conclusão (Notificada)") {
+            return 33.81;
+        }
+    }
+
     if (item === "Alvará de projeto e execução" || item === "Certidão de conclusão") {
         if (utilizacao === "Residencial") {
             if (area <= 200) return 31.58;       
@@ -652,7 +668,10 @@ btnConfirmar.addEventListener('click', function() {
             itemSelecionado === "Renovação de alvará de projeto" || 
             itemSelecionado === "Renovação de alvará de reforma") {
             
-            let articleUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
+            let articleUtilizacao = "comercial";
+            if (utilizacao === "Residencial") articleUtilizacao = "residencial";
+            if (utilizacao === "Galpão") articleUtilizacao = "do tipo galpão";
+            
             let stringDescricao = `${itemSelecionado} de uma edificação ${articleUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
             document.getElementById('texto-descricao-resultado').innerText = stringDescricao;
             
@@ -688,7 +707,9 @@ btnConfirmar.addEventListener('click', function() {
             if (selectProjeto.value === "comunicado-demolicao") {
                 stringDescricao = `${itemSelecionado} para uma área de ${area.toFixed(2).replace('.', ',')}m².`;
             } else {
-                let articleUtilizacao = (utilizacao === "Residencial") ? "residencial" : "comercial";
+                let articleUtilizacao = "comercial";
+                if (utilizacao === "Residencial") articleUtilizacao = "residencial";
+                if (utilizacao === "Galpão") articleUtilizacao = "do tipo galpão";
                 stringDescricao = `${itemSelecionado} de uma edificação ${articleUtilizacao} em ${tipoConstrucaoTexto} com ${area.toFixed(2).replace('.', ',')}m².`;
             }
             
