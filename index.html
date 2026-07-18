@@ -22,6 +22,7 @@ body{
     display:flex;
     flex-direction:column;
     align-items:center;
+    /* Espaçamento ajustado na base por conta do rodapé fixo */
     padding:40px 20px 140px 20px;
     min-height: 100vh;
 }
@@ -189,6 +190,7 @@ footer {
     line-height: 1.5;
     box-shadow: 0 -5px 25px rgba(0,0,0,.08);
     border-radius: 18px 18px 0 0;
+    /* Mantém apenas o rodapé fixo na base da tela */
     position: fixed;
     bottom: 0;
     left: 0;
@@ -367,10 +369,10 @@ body {
         <p>Técnico em Edificações/Agrimensura</p>
         <p>Telefone/WhatsApp: (44) 98438-4272</p>
         
-        <!-- Contador Sincronizado com o link Ativo do seu GitHub -->
+        <!-- Contador de Visitas Corrigido e Centralizado -->
         <div class="counter-container">
             <span>Contador de Visitas:</span>
-            <img src="https://profile-counter.glitch.me/welersonalmeida-simulador-taxas/count.svg" alt="Contador de Visitas" />
+            <img src="https://profile-counter.glitch.me/welerson-simulador/count.svg" alt="Contador de Visitas" />
         </div>
     </footer>
 
@@ -419,6 +421,8 @@ const btnVoltar = document.getElementById('btn-voltar');
 const telaFormulario = document.getElementById('tela-formulario');
 const telaResultado = document.getElementById('tela-resultado');
 const blocoObsIssqn = document.getElementById('bloco-obs-issqn');
+
+// LÓGICA DE SEQUENCIAMENTO CAMPO A CAMPO (CASCATA ATUALIZADA)
 
 selectCidade.addEventListener('change', function() {
     if (this.value === "Maringá") {
@@ -531,6 +535,8 @@ function resetarPassosAbaixoDe(nivel) {
     btnConfirmar.disabled = true;
 }
 
+// FUNÇÕES DE CÁLCULO LEGAIS (PÁGINA 1 DO PDF 2026)
+
 function obterTaxaLicenca(linha, area) {
     if (linha === 1 || Math.abs(linha - 5) < 0.01) { 
         if (area <= 60) return 39.26;
@@ -629,6 +635,7 @@ function obterValorMetroISSQN(item, utilizacao, area) {
     return 0;
 }
 
+// MONITORAMENTO DO CLIQUE PARA SIMULAÇÃO
 btnConfirmar.addEventListener('click', function() {
     const itemSelecionado = selectItem.value;
     const utilizacao = selectUtilizacao.value;
